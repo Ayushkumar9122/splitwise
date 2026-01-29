@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Expense | SplitPro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #e0e7ff;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-main);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* Layout */
+        .app-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            padding: 10px 0;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            transition: var(--transition);
+            outline: none;
+            background: #fff;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .input-with-icon input {
+            padding-left: 44px;
+        }
+
+        /* Amount Input Special Styling */
+        .amount-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .currency-selector {
+            width: 100px !important;
+            font-weight: 700;
+            background: var(--primary-light);
+            border-color: transparent;
+            color: var(--primary-dark);
+        }
+
+        .amount-input {
+            font-size: 2rem !important;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.02em;
+        }
+
+        /* Category Picker */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 8px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            gap: 8px;
+        }
+
+        .category-item i {
+            font-size: 1.5rem;
+        }
+
+        .category-item span {
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .category-item.active {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Payer Section */
+        .payer-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .payer-chip {
+            padding: 8px 16px;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .payer-chip.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .payer-chip img {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Multi-Payer Logic UI */
+        .multi-payer-list {
+            margin-top: 16px;
+            display: none;
+            background: var(--background);
+            padding: 16px;
+            border-radius: var(--radius-md);
+        }
+
+        .multi-payer-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        /* Split Section */
+        .split-methods {
+            display: flex;
+            overflow-x: auto;
+            gap: 8px;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            scrollbar-width: none;
+        }
+
+        .split-methods::-webkit-scrollbar {
+            display: none;
+        }
+
+        .method-btn {
+            flex: 0 0 auto;
+            padding: 10px 20px;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+            background: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .method-btn.active {
+            background: var(--text-main);
+            color: white;
+            border-color: var(--text-main);
+        }
+
+        /* Member Split List */
+        .member-split-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .member-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px;
+            background: var(--background);
+            border-radius: var(--radius-md);
+            transition: var(--transition);
+        }
+
+        .member-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .member-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .split-input-wrapper {
+            width: 120px;
+            position: relative;
+        }
+
+        .split-input-wrapper input {
+            padding: 8px 12px;
+            text-align: right;
+        }
+
+        .split-input-wrapper span.suffix {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        /* Pro Features */
+        .pro-badge {
+            background: linear-gradient(135deg, #f59e0b, #ea580c);
+            color: white;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .pro-section {
+            border: 2px dashed var(--accent);
+            background: #fffbeb;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pro-section::after {
+            content: 'PRO';
+            position: absolute;
+            top: 10px;
+            right: -25px;
+            background: var(--accent);
+            color: white;
+            padding: 2px 30px;
+            font-size: 0.7rem;
+            font-weight: 900;
+            transform: rotate(45deg);
+        }
+
+        .receipt-scanner-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 700;
+            border-radius: var(--radius-md);
+            transition: var(--transition);
+        }
+
+        .receipt-scanner-link:hover {
+            background: #fef3c7;
+        }
+
+        /* Footer / Summary */
+        .summary-bar {
+            position: sticky;
+            bottom: 20px;
+            background: var(--text-main);
+            color: white;
+            padding: 20px 32px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        .summary-info h4 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-bottom: 4px;
+        }
+
+        .summary-info p {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .save-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .save-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .save-btn:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Progress Bar for Splits */
+        .split-progress-container {
+            margin-top: 10px;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .split-progress-bar {
+            height: 100%;
+            background: var(--secondary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .split-progress-bar.error {
+            background: var(--danger);
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .animate-up {
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .app-container { padding: 12px; }
+            .card { padding: 20px; }
+            .amount-input { font-size: 1.5rem !important; }
+            .summary-bar { flex-direction: column; gap: 16px; text-align: center; }
+            .save-btn { width: 100%; justify-content: center; }
+        }
+
+        /* Checkbox Styling */
+        .custom-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .custom-checkbox.checked {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .hidden-checkbox {
+            display: none;
+        }
+
+        /* Validation Messages */
+        .validation-msg {
+            font-size: 0.75rem;
+            margin-top: 4px;
+            color: var(--danger);
+            display: none;
+        }
+
+        .itemization-container {
+            margin-top: 20px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+        }
+
+        .item-row {
+            display: grid;
+            grid-template-columns: 1fr 80px 100px 40px;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .add-item-btn {
+            background: none;
+            border: 1px dashed var(--primary);
+            color: var(--primary);
+            width: 100%;
+            padding: 10px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <button class="back-btn" onclick="history.back()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <h1>Add Expense</h1>
+        <div style="width: 40px;"></div> <!-- Spacer -->
+    </header>
+
+    <form id="expenseForm">
+        <!-- Basic Info Section -->
+        <div class="card animate-up" style="animation-delay: 0.1s;">
+            <div class="form-group">
+                <label>Description</label>
+                <div class="input-with-icon">
+                    <i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></i>
+                    <input type="text" id="description" placeholder="What was it for?" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Amount</label>
+                <div class="amount-container">
+                    <select id="currency" class="currency-selector">
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="GBP">GBP</option>
+                        <option value="INR">INR</option>
+                        <option value="JPY">JPY</option>
+                    </select>
+                    <input type="number" id="totalAmount" class="amount-input" placeholder="0.00" step="0.01" min="0.01" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Category</label>
+                <div class="category-grid" id="categoryGrid">
+                    <!-- Categories injected by JS -->
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="expenseDate">
+            </div>
+        </div>
+
+        <!-- Payer Section -->
+        <div class="card animate-up" style="animation-delay: 0.2s;">
+            <label>Paid By</label>
+            <div class="payer-container" id="payerContainer">
+                <!-- Payer chips injected by JS -->
+                <div class="payer-chip" id="multiPayerToggle">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    Multiple People
+                </div>
+            </div>
+
+            <div class="multi-payer-list" id="multiPayerList">
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Enter amount paid by each person:</p>
+                <div id="multiPayerRows"></div>
+                <div id="payerValidation" class="validation-msg">Total paid must equal <span id="targetAmount">0.00</span></div>
+            </div>
+        </div>
+
+        <!-- Split Section -->
+        <div class="card animate-up" style="animation-delay: 0.3s;">
+            <label>Split Method</label>
+            <div class="split-methods">
+                <button type="button" class="method-btn active" data-method="equally">Equally</button>
+                <button type="button" class="method-btn" data-method="unequally">Unequally</button>
+                <button type="button" class="method-btn" data-method="percentages">Percentages</button>
+                <button type="button" class="method-btn" data-method="shares">Shares</button>
+                <button type="button" class="method-btn" data-method="adjustments">Adjustments</button>
+            </div>
+
+            <div class="member-split-list" id="memberSplitList">
+                <!-- Members injected by JS -->
+            </div>
+
+            <div class="split-progress-container">
+                <div id="splitProgressBar" class="split-progress-bar"></div>
+            </div>
+            <div id="splitValidation" class="validation-msg">Sum of splits does not match total amount.</div>
+        </div>
+
+        <!-- Pro Features Section -->
+        <div class="card pro-section animate-up" style="animation-delay: 0.4s;">
+            <label>Pro Tools <span class="pro-badge">PRO</span></label>
+            <a href="receipt_scanner.html" class="receipt-scanner-link">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                Scan Receipt with AI
+            </a>
+            
+            <div class="itemization-container">
+                <label>Itemized Breakdown</label>
+                <div id="itemList">
+                    <!-- Item rows injected here -->
+                </div>
+                <button type="button" class="add-item-btn" id="addItemBtn">+ Add Item</button>
+            </div>
+        </div>
+    </form>
+
+    <div style="height: 100px;"></div> <!-- Spacer for sticky bottom -->
+</div>
+
+<!-- Sticky Footer -->
+<div class="summary-bar animate-up">
+    <div class="summary-info">
+        <h4>Group Balance Impact</h4>
+        <p id="summaryText">Ready to split</p>
+    </div>
+    <button type="button" id="submitExpense" class="save-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+        Save Expense
+    </button>
+</div>
+
+<!-- Firebase Logic & App State -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, doc, updateDoc, increment, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBwJK7Y_gtEYXNI0Ntm3P0ockh_c5sSizs",
+        authDomain: "portfolio-c2803.firebaseapp.com",
+        projectId: "portfolio-c2803",
+        storageBucket: "portfolio-c2803.firebasestorage.app",
+        messagingSenderId: "891551375739",
+        appId: "1:891551375739:web:9acc9d36d076263736ddde",
+        measurementId: "G-3S06FWVC8T"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // --- State Management ---
+    const state = {
+        groupId: "group_123", // Mock group ID
+        members: [
+            { id: "u1", name: "You", avatar: "Y", email: "you@example.com" },
+            { id: "u2", name: "Sarah Chen", avatar: "SC", email: "sarah@example.com" },
+            { id: "u3", name: "Mike Ross", avatar: "MR", email: "mike@example.com" },
+            { id: "u4", name: "Jessica P.", avatar: "JP", email: "jess@example.com" }
+        ],
+        categories: [
+            { id: "cat1", name: "Food", icon: "🍔" },
+            { id: "cat2", name: "Rent", icon: "🏠" },
+            { id: "cat3", name: "Travel", icon: "✈️" },
+            { id: "cat4", name: "Utilities", icon: "💡" },
+            { id: "cat5", name: "Entertainment", icon: "🎬" },
+            { id: "cat6", name: "Shopping", icon: "🛍️" }
+        ],
+        selectedCategory: "cat1",
+        currentPayerId: "u1", // Default payer is 'You'
+        isMultiPayer: false,
+        multiPayers: {}, // {userId: amount}
+        splitMethod: "equally",
+        splits: {}, // {userId: {value: number, amount: number, selected: bool}}
+        totalAmount: 0,
+        currency: "USD",
+        items: [] // For Pro itemization
+    };
+
+    // --- DOM Elements ---
+    const totalInput = document.getElementById('totalAmount');
+    const categoryGrid = document.getElementById('categoryGrid');
+    const payerContainer = document.getElementById('payerContainer');
+    const multiPayerList = document.getElementById('multiPayerList');
+    const multiPayerRows = document.getElementById('multiPayerRows');
+    const memberSplitList = document.getElementById('memberSplitList');
+    const methodBtns = document.querySelectorAll('.method-btn');
+    const splitProgressBar = document.getElementById('splitProgressBar');
+    const submitBtn = document.getElementById('submitExpense');
+    const dateInput = document.getElementById('expenseDate');
+
+    // --- Initialization ---
+    function init() {
+        // Set default date to today
+        dateInput.valueAsDate = new Date();
+        
+        renderCategories();
+        renderPayers();
+        renderMemberSplits();
+        setupEventListeners();
+        calculateSplits();
+    }
+
+    function renderCategories() {
+        categoryGrid.innerHTML = state.categories.map(cat => `
+            <div class="category-item ${state.selectedCategory === cat.id ? 'active' : ''}" data-id="${cat.id}">
+                <i>${cat.icon}</i>
+                <span>${cat.name}</span>
+            </div>
+        `).join('');
+
+        categoryGrid.querySelectorAll('.category-item').forEach(item => {
+            item.addEventListener('click', () => {
+                state.selectedCategory = item.dataset.id;
+                renderCategories();
+            });
+        });
+    }
+
+    function renderPayers() {
+        const chips = state.members.map(member => `
+            <div class="payer-chip ${!state.isMultiPayer && state.currentPayerId === member.id ? 'active' : ''}" data-user-id="${member.id}">
+                <div class="member-avatar" style="width: 20px; height: 20px; font-size: 0.6rem;">${member.avatar}</div>
+                ${member.name}
+            </div>
+        `).join('');
+
+        const multiToggle = document.getElementById('multiPayerToggle');
+        payerContainer.innerHTML = chips;
+        payerContainer.appendChild(multiToggle);
+
+        if (state.isMultiPayer) {
+            multiToggle.classList.add('active');
+            multiPayerList.style.display = 'block';
+            renderMultiPayerInputs();
+        } else {
+            multiToggle.classList.remove('active');
+            multiPayerList.style.display = 'none';
+        }
+
+        // Add Listeners
+        payerContainer.querySelectorAll('.payer-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                if (chip.id === 'multiPayerToggle') {
+                    state.isMultiPayer = !state.isMultiPayer;
+                } else {
+                    state.isMultiPayer = false;
+                    state.currentPayerId = chip.dataset.userId;
+                }
+                renderPayers();
+                validateForm();
+            });
+        });
+    }
+
+    function renderMultiPayerInputs() {
+        multiPayerRows.innerHTML = state.members.map(member => `
+            <div class="multi-payer-row">
+                <div class="member-info">
+                    <div class="member-avatar">${member.avatar}</div>
+                    <span class="member-name">${member.name}</span>
+                </div>
+                <div class="split-input-wrapper">
+                    <input type="number" class="payer-input" data-user-id="${member.id}" 
+                           value="${state.multiPayers[member.id] || ''}" placeholder="0.00">
+                    <span class="suffix">${state.currency}</span>
+                </div>
+            </div>
+        `).join('');
+
+        multiPayerRows.querySelectorAll('.payer-input').forEach(input => {
+            input.addEventListener('input', (e) => {
+                state.multiPayers[e.target.dataset.userId] = parseFloat(e.target.value) || 0;
+                validateForm();
+            });
+        });
+    }
+
+    function renderMemberSplits() {
+        memberSplitList.innerHTML = state.members.map(member => {
+            const isSelected = state.splits[member.id]?.selected !== false;
+            const value = state.splits[member.id]?.value || '';
+            const amount = state.splits[member.id]?.amount || 0;
+            
+            let inputField = '';
+            let suffix = state.currency;
+
+            switch(state.splitMethod) {
+                case 'equally':
+                    inputField = `<div class="member-name" style="text-align: right; flex: 1;">${state.currency} ${amount.toFixed(2)}</div>`;
+                    break;
+                case 'unequally':
+                    inputField = `<div class="split-input-wrapper"><input type="number" class="split-val" data-user-id="${member.id}" value="${value}" placeholder="0.00"><span class="suffix">${state.currency}</span></div>`;
+                    break;
+                case 'percentages':
+                    inputField = `<div class="split-input-wrapper"><input type="number" class="split-val" data-user-id="${member.id}" value="${value}" placeholder="0"><span class="suffix">%</span></div>`;
+                    break;
+                case 'shares':
+                    inputField = `<div class="split-input-wrapper"><input type="number" class="split-val" data-user-id="${member.id}" value="${value}" placeholder="1"><span class="suffix">shares</span></div>`;
+                    break;
+                case 'adjustments':
+                    inputField = `<div class="split-input-wrapper"><input type="number" class="split-val" data-user-id="${member.id}" value="${value}" placeholder="+/-"><span class="suffix">${state.currency}</span></div>`;
+                    break;
+            }
+
+            return `
+                <div class="member-row ${!isSelected ? 'muted' : ''}" data-user-id="${member.id}">
+                    <div class="custom-checkbox ${isSelected ? 'checked' : ''}" data-user-id="${member.id}">
+                        ${isSelected ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>' : ''}
+                    </div>
+                    <div class="member-info">
+                        <div class="member-avatar">${member.avatar}</div>
+                        <span class="member-name">${member.name}</span>
+                    </div>
+                    ${inputField}
+                </div>
+            `;
+        }).join('');
+
+        // Listeners for split inputs
+        memberSplitList.querySelectorAll('.split-val').forEach(input => {
+            input.addEventListener('input', (e) => {
+                const userId = e.target.dataset.userId;
+                if (!state.splits[userId]) state.splits[userId] = { selected: true };
+                state.splits[userId].value = parseFloat(e.target.value) || 0;
+                calculateSplits();
+            });
+        });
+
+        // Listeners for checkboxes
+        memberSplitList.querySelectorAll('.custom-checkbox').forEach(cb => {
+            cb.addEventListener('click', () => {
+                const userId = cb.dataset.userId;
+                if (!state.splits[userId]) state.splits[userId] = { value: 0 };
+                state.splits[userId].selected = !state.splits[userId].selected;
+                renderMemberSplits();
+                calculateSplits();
+            });
+        });
+    }
+
+    // --- Math Engine ---
+    function calculateSplits() {
+        const total = parseFloat(totalInput.value) || 0;
+        state.totalAmount = total;
+        
+        const activeMembers = state.members.filter(m => state.splits[m.id]?.selected !== false);
+        const count = activeMembers.length;
+
+        if (count === 0) return;
+
+        let calculatedSplits = {};
+
+        switch(state.splitMethod) {
+            case 'equally':
+                const equalShare = Math.floor((total / count) * 100) / 100;
+                let remainder = Math.round((total - (equalShare * count)) * 100) / 100;
+                
+                activeMembers.forEach((m, idx) => {
+                    // Distribute remainder pennies to the first few people
+                    const extra = idx < Math.round(remainder * 100) ? 0.01 : 0;
+                    calculatedSplits[m.id] = equalShare + extra;
+                });
+                break;
+
+            case 'unequally':
+                state.members.forEach(m => {
+                    calculatedSplits[m.id] = state.splits[m.id]?.selected ? (state.splits[m.id]?.value || 0) : 0;
+                });
+                break;
+
+            case 'percentages':
+                state.members.forEach(m => {
+                    const pct = state.splits[m.id]?.selected ? (state.splits[m.id]?.value || 0) : 0;
+                    calculatedSplits[m.id] = (pct / 100) * total;
+                });
+                break;
+
+            case 'shares':
+                let totalShares = 0;
+                activeMembers.forEach(m => {
+                    totalShares += (state.splits[m.id]?.value || 1);
+                });
+                
+                if (totalShares > 0) {
+                    activeMembers.forEach(m => {
+                        const share = state.splits[m.id]?.value || 1;
+                        calculatedSplits[m.id] = (share / totalShares) * total;
+                    });
+                }
+                break;
+
+            case 'adjustments':
+                const baseEqual = total / count;
+                let totalAdjustments = 0;
+                activeMembers.forEach(m => {
+                    totalAdjustments += (state.splits[m.id]?.value || 0);
+                });
+                
+                const adjustedBase = (total - totalAdjustments) / count;
+                activeMembers.forEach(m => {
+                    calculatedSplits[m.id] = adjustedBase + (state.splits[m.id]?.value || 0);
+                });
+                break;
+        }
+
+        // Update state and UI
+        state.members.forEach(m => {
+            if (!state.splits[m.id]) state.splits[m.id] = { selected: true };
+            state.splits[m.id].amount = calculatedSplits[m.id] || 0;
+        });
+
+        if (state.splitMethod === 'equally') {
+            renderMemberSplits(); // Refresh to show the calculated dollar amounts
+        }
+
+        updateProgressAndSummary();
+        validateForm();
+    }
+
+    function updateProgressAndSummary() {
+        const total = state.totalAmount;
+        let sumSplits = 0;
+        state.members.forEach(m => {
+            sumSplits += state.splits[m.id]?.amount || 0;
+        });
+
+        const diff = Math.abs(total - sumSplits);
+        const isMatch = diff < 0.01;
+        
+        const progress = total > 0 ? (sumSplits / total) * 100 : 0;
+        splitProgressBar.style.width = `${Math.min(progress, 100)}%`;
+        splitProgressBar.classList.toggle('error', !isMatch && total > 0);
+
+        const summaryText = document.getElementById('summaryText');
+        if (total <= 0) {
+            summaryText.innerText = "Enter an amount";
+        } else if (!isMatch) {
+            const remaining = (total - sumSplits).toFixed(2);
+            summaryText.innerText = `${remaining > 0 ? 'Short' : 'Over'} by ${state.currency} ${Math.abs(remaining)}`;
+            summaryText.style.color = "var(--danger)";
+        } else {
+            summaryText.innerText = "Splits match total! ✅";
+            summaryText.style.color = "var(--secondary)";
+        }
+    }
+
+    function validateForm() {
+        const total = parseFloat(totalInput.value) || 0;
+        const desc = document.getElementById('description').value;
+        
+        // Split Validation
+        let sumSplits = 0;
+        state.members.forEach(m => {
+            sumSplits += state.splits[m.id]?.amount || 0;
+        });
+        const splitsMatch = Math.abs(total - sumSplits) < 0.01;
+        document.getElementById('splitValidation').style.display = splitsMatch ? 'none' : 'block';
+
+        // Payer Validation
+        let payerValid = true;
+        if (state.isMultiPayer) {
+            let sumPaid = 0;
+            Object.values(state.multiPayers).forEach(v => sumPaid += v);
+            payerValid = Math.abs(total - sumPaid) < 0.01;
+            document.getElementById('payerValidation').style.display = payerValid ? 'none' : 'block';
+            document.getElementById('targetAmount').innerText = total.toFixed(2);
+        }
+
+        const isValid = total > 0 && desc.length > 0 && splitsMatch && payerValid;
+        submitBtn.disabled = !isValid;
+    }
+
+    function setupEventListeners() {
+        totalInput.addEventListener('input', () => {
+            calculateSplits();
+            validateForm();
+        });
+
+        document.getElementById('description').addEventListener('input', validateForm);
+
+        methodBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                methodBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.splitMethod = btn.dataset.method;
+                
+                // Reset split values when switching modes to avoid confusion
+                state.members.forEach(m => {
+                    if (state.splits[m.id]) state.splits[m.id].value = (state.splitMethod === 'shares' ? 1 : 0);
+                });
+
+                renderMemberSplits();
+                calculateSplits();
+            });
+        });
+
+        document.getElementById('currency').addEventListener('change', (e) => {
+            state.currency = e.target.value;
+            renderMemberSplits();
+            renderMultiPayerInputs();
+            updateProgressAndSummary();
+        });
+
+        // Pro Itemization
+        document.getElementById('addItemBtn').addEventListener('click', () => {
+            const id = Date.now();
+            const row = document.createElement('div');
+            row.className = 'item-row animate-up';
+            row.id = `item-${id}`;
+            row.innerHTML = `
+                <input type="text" placeholder="Item name" class="item-name">
+                <input type="number" placeholder="Qty" class="item-qty" value="1">
+                <input type="number" placeholder="Price" class="item-price">
+                <button type="button" style="background:none; border:none; color:var(--danger); cursor:pointer;" onclick="this.parentElement.remove()">✕</button>
+            `;
+            document.getElementById('itemList').appendChild(row);
+        });
+
+        submitBtn.addEventListener('click', saveExpense);
+    }
+
+    // --- Data Persistence ---
+    async function saveExpense() {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<svg class="spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Saving...`;
+
+        const expenseData = {
+            description: document.getElementById('description').value,
+            totalAmount: state.totalAmount,
+            currency: state.currency,
+            date: dateInput.value,
+            categoryId: state.selectedCategory,
+            groupId: state.groupId,
+            splitMethod: state.splitMethod,
+            createdAt: new Date().toISOString(),
+            paidBy: state.isMultiPayer ? state.multiPayers : { [state.currentPayerId]: state.totalAmount },
+            splits: state.members.map(m => ({
+                userId: m.id,
+                amount: state.splits[m.id]?.amount || 0,
+                methodValue: state.splits[m.id]?.value || 0,
+                selected: state.splits[m.id]?.selected !== false
+            }))
+        };
+
+        try {
+            // 1. Save to 'expenses' collection
+            const docRef = await addDoc(collection(db, "expenses"), expenseData);
+            console.log("Expense saved with ID: ", docRef.id);
+
+            // 2. Update Group Balances (Logic for groupMemberships)
+            // For each member, calculate their net change: Paid - Owed
+            for (const member of state.members) {
+                const paid = expenseData.paidBy[member.id] || 0;
+                const owed = state.splits[member.id]?.amount || 0;
+                const netImpact = paid - owed;
+
+                if (netImpact !== 0) {
+                    const membershipQuery = query(
+                        collection(db, "groupMemberships"), 
+                        where("groupId", "==", state.groupId),
+                        where("userId", "==", member.id)
+                    );
+                    const snap = await getDocs(membershipQuery);
+                    if (!snap.empty) {
+                        const membershipDoc = snap.docs[0];
+                        await updateDoc(doc(db, "groupMemberships", membershipDoc.id), {
+                            netBalance: increment(netImpact)
+                        });
+                    }
+                }
+            }
+
+            // Success Animation & Redirect
+            submitBtn.style.background = "var(--secondary)";
+            submitBtn.innerHTML = "Success! Redirecting...";
+            
+            setTimeout(() => {
+                window.location.href = `group_details.html?id=${state.groupId}`;
+            }, 1500);
+
+        } catch (e) {
+            console.error("Error adding document: ", e);
+            alert("Error saving expense. Please try again.");
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = "Save Expense";
+        }
+    }
+
+    // Run app
+    init();
+
+</script>
+
+<style>
+    /* Additional Utility Styles */
+    .muted { opacity: 0.5; }
+    .spinner {
+        animation: rotate 1s linear infinite;
+    }
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: var(--background);
+    }
+    ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--text-muted);
+    }
+</style>
+
+</body>
+</html>
