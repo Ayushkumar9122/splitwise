@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile | ExpenseTracker Pro</title>
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #ec4899;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 1rem;
+            --radius-full: 9999px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.5;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Layout */
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        .logo-section h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Profile Card */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 992px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .profile-main-card {
+            text-align: center;
+            animation: fadeInLeft 0.8s ease;
+        }
+
+        .profile-image-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .profile-image-container img {
+            width: 100%;
+            height: 100%;
+            border-radius: var(--radius-full);
+            object-fit: cover;
+            border: 4px solid var(--primary-light);
+            background: var(--border-color);
+        }
+
+        .edit-photo-btn {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: var(--primary);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid var(--bg-card);
+            transition: var(--transition);
+        }
+
+        .edit-photo-btn:hover {
+            transform: scale(1.1);
+            background: var(--primary-dark);
+        }
+
+        .user-name {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .user-email {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .badge-pro {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .badge-free {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--border-color);
+            color: var(--text-muted);
+            padding: 0.4rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-light);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            margin-top: 0.5rem;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: var(--bg-body);
+            color: var(--text-main);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: var(--border-color);
+        }
+
+        .btn-danger {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        /* Navigation Links */
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .nav-link-item {
+            flex: 1;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: var(--bg-body);
+            border-radius: var(--radius-md);
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .nav-link-item i {
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .nav-link-item:hover {
+            background: var(--primary-light);
+            color: white;
+        }
+
+        .nav-link-item:hover i {
+            color: white;
+        }
+
+        /* Edit Mode Toggles */
+        .view-mode {
+            display: block;
+        }
+        .edit-mode {
+            display: none;
+        }
+        .is-editing .view-mode {
+            display: none;
+        }
+        .is-editing .edit-mode {
+            display: block;
+        }
+
+        /* Modal Styling */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 500px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .cropper-container-wrapper {
+            width: 100%;
+            height: 300px;
+            margin-bottom: 1.5rem;
+            background: #000;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 9999;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            color: var(--text-main);
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            border-left: 4px solid var(--primary);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideInRight 0.4s ease;
+        }
+
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Skeleton Loading */
+        .skeleton {
+            background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-body) 50%, var(--border-color) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Loading Overlay */
+        #global-loader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-body);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--border-color);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <div id="global-loader">
+        <div class="spinner"></div>
+        <p style="margin-top: 1rem; font-weight: 600; color: var(--text-muted);">Syncing Profile...</p>
+    </div>
+
+    <div class="app-container">
+        <header>
+            <div class="logo-section">
+                <h1><i class="fas fa-wallet"></i> ExpenseTracker</h1>
+            </div>
+            <div class="actions">
+                <button class="btn btn-outline" id="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="profile-grid" id="profile-content">
+            <!-- Left Side: Profile Info -->
+            <aside class="card profile-main-card" id="main-card">
+                <div class="profile-image-container">
+                    <img id="display-photo" src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="Profile">
+                    <label for="image-upload" class="edit-photo-btn">
+                        <i class="fas fa-camera"></i>
+                    </label>
+                    <input type="file" id="image-upload" accept="image/*" style="display: none;">
+                </div>
+
+                <div class="view-mode">
+                    <h2 class="user-name" id="display-name">Loading...</h2>
+                    <p class="user-email" id="display-email">email@example.com</p>
+                    <div id="pro-status-container">
+                        <!-- Badge injected here -->
+                    </div>
+                    
+                    <div style="margin-top: 2rem;">
+                        <button class="btn btn-primary btn-block" id="edit-profile-btn">
+                            <i class="fas fa-user-edit"></i> Edit Profile
+                        </button>
+                    </div>
+                </div>
+
+                <div class="edit-mode">
+                    <form id="profile-form">
+                        <div class="form-group">
+                            <label>Display Name</label>
+                            <input type="text" id="input-name" class="form-control" placeholder="Your Name">
+                        </div>
+                        <div class="form-group">
+                            <label>Default Currency</label>
+                            <select id="input-currency" class="form-control">
+                                <option value="USD">USD ($)</option>
+                                <option value="EUR">EUR (€)</option>
+                                <option value="GBP">GBP (£)</option>
+                                <option value="JPY">JPY (¥)</option>
+                                <option value="INR">INR (₹)</option>
+                                <option value="CAD">CAD ($)</option>
+                                <option value="AUD">AUD ($)</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 1rem;">
+                            <button type="button" class="btn btn-outline btn-block" id="cancel-edit-btn">Cancel</button>
+                            <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="nav-links">
+                    <a href="categories.html" class="nav-link-item">
+                        <i class="fas fa-tags"></i>
+                        <span>Categories</span>
+                    </a>
+                    <a href="#" class="nav-link-item" id="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </aside>
+
+            <!-- Right Side: Statistics -->
+            <section>
+                <div class="card">
+                    <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-chart-line" style="color: var(--primary);"></i>
+                        Account Statistics
+                    </h3>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-value" id="stat-groups">0</span>
+                            <span class="stat-label">Groups Joined</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="stat-expenses">0</span>
+                            <span class="stat-label">Total Expenses</span>
+                        </div>
+                        <div class="stat-card" style="grid-column: span 2;">
+                            <span class="stat-value" id="stat-lifetime-spent">$0.00</span>
+                            <span class="stat-label">Lifetime Total Spent</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem; padding: 1.5rem; background: var(--bg-body); border-radius: var(--radius-md); border-left: 4px solid var(--accent);">
+                        <h4 style="font-size: 1rem; margin-bottom: 0.5rem;">Pro Membership</h4>
+                        <p id="pro-description" style="font-size: 0.85rem; color: var(--text-muted);">
+                            Unlock advanced analytics, unlimited groups, and receipt scanning by upgrading to Pro.
+                        </p>
+                        <button class="btn btn-outline" style="margin-top: 1rem; font-size: 0.8rem;" id="upgrade-btn">
+                            Learn More
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Image Cropper Modal -->
+    <div class="modal" id="cropper-modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 1rem;">Adjust Profile Picture</h3>
+            <div class="cropper-container-wrapper">
+                <img id="cropper-image" src="" alt="To crop">
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-outline btn-block" id="close-cropper">Cancel</button>
+                <button class="btn btn-primary btn-block" id="save-crop">Crop & Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Firebase & Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { 
+            getFirestore, doc, getDoc, setDoc, updateDoc, 
+            collection, query, where, getDocs, onSnapshot 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+        import "https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBwJK7Y_gtEYXNI0Ntm3P0ockh_c5sSizs",
+            authDomain: "portfolio-c2803.firebaseapp.com",
+            projectId: "portfolio-c2803",
+            storageBucket: "portfolio-c2803.firebasestorage.app",
+            messagingSenderId: "891551375739",
+            appId: "1:891551375739:web:9acc9d36d076263736ddde",
+            measurementId: "G-3S06FWVC8T"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        // State Management
+        let currentUser = null;
+        let cropper = null;
+        let userProfileData = null;
+
+        // UI Elements
+        const mainCard = document.getElementById('main-card');
+        const profileForm = document.getElementById('profile-form');
+        const cropperModal = document.getElementById('cropper-modal');
+        const cropperImg = document.getElementById('cropper-image');
+        const toastContainer = document.getElementById('toast-container');
+        const loader = document.getElementById('global-loader');
+
+        // Initialize App
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                await fetchUserProfile();
+                await fetchUserStatistics();
+                hideLoader();
+            } else {
+                window.location.href = "login.html"; // Redirect if not logged in
+            }
+        });
+
+        // --- Data Fetching ---
+
+        async function fetchUserProfile() {
+            const userRef = doc(db, "users", currentUser.uid);
+            const docSnap = await getDoc(userRef);
+
+            if (docSnap.exists()) {
+                userProfileData = docSnap.data();
+                updateUI(userProfileData);
+            } else {
+                // Initialize default profile if document doesn't exist
+                const defaultData = {
+                    displayName: currentUser.displayName || "New User",
+                    photoURL: currentUser.photoURL || `https://ui-avatars.com/api/?name=${currentUser.email}&background=6366f1&color=fff`,
+                    defaultCurrency: "USD",
+                    proMember: false,
+                    email: currentUser.email,
+                    createdAt: new Date().toISOString()
+                };
+                await setDoc(userRef, defaultData);
+                userProfileData = defaultData;
+                updateUI(defaultData);
+            }
+        }
+
+        async function fetchUserStatistics() {
+            try {
+                // 1. Total Groups Joined
+                const groupsQuery = query(collection(db, "groups"), where("members", "array-contains", currentUser.uid));
+                const groupsSnap = await getDocs(groupsQuery);
+                document.getElementById('stat-groups').textContent = groupsSnap.size;
+
+                // 2. Total Expenses and Lifetime Spent
+                const expensesQuery = query(collection(db, "expenses"), where("addedBy", "==", currentUser.uid));
+                const expensesSnap = await getDocs(expensesQuery);
+                
+                let totalSpent = 0;
+                expensesSnap.forEach(doc => {
+                    const data = doc.data();
+                    totalSpent += parseFloat(data.amount || 0);
+                });
+
+                document.getElementById('stat-expenses').textContent = expensesSnap.size;
+                
+                const currencySymbol = getCurrencySymbol(userProfileData?.defaultCurrency || 'USD');
+                document.getElementById('stat-lifetime-spent').textContent = `${currencySymbol}${totalSpent.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            } catch (error) {
+                console.error("Error fetching stats:", error);
+            }
+        }
+
+        // --- UI Logic ---
+
+        function updateUI(data) {
+            document.getElementById('display-name').textContent = data.displayName;
+            document.getElementById('display-email').textContent = currentUser.email;
+            document.getElementById('display-photo').src = data.photoURL;
+
+            // Update inputs
+            document.getElementById('input-name').value = data.displayName;
+            document.getElementById('input-currency').value = data.defaultCurrency || "USD";
+
+            // Pro Status
+            const proContainer = document.getElementById('pro-status-container');
+            const proDesc = document.getElementById('pro-description');
+            const upgradeBtn = document.getElementById('upgrade-btn');
+
+            if (data.proMember) {
+                proContainer.innerHTML = `<span class="badge-pro"><i class="fas fa-crown"></i> Pro Member</span>`;
+                proDesc.textContent = "You have full access to all premium features. Thank you for supporting us!";
+                upgradeBtn.style.display = "none";
+            } else {
+                proContainer.innerHTML = `<span class="badge-free">Free Account</span>`;
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            toastContainer.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        function hideLoader() {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.visibility = 'hidden', 500);
+        }
+
+        // --- Event Listeners ---
+
+        // Toggle Edit Mode
+        document.getElementById('edit-profile-btn').addEventListener('click', () => {
+            mainCard.classList.add('is-editing');
+        });
+
+        document.getElementById('cancel-edit-btn').addEventListener('click', () => {
+            mainCard.classList.remove('is-editing');
+        });
+
+        // Handle Profile Update
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newName = document.getElementById('input-name').value;
+            const newCurrency = document.getElementById('input-currency').value;
+
+            try {
+                const userRef = doc(db, "users", currentUser.uid);
+                await updateDoc(userRef, {
+                    displayName: newName,
+                    defaultCurrency: newCurrency
+                });
+
+                // Update Firebase Auth profile too
+                await updateProfile(currentUser, { displayName: newName });
+
+                userProfileData.displayName = newName;
+                userProfileData.defaultCurrency = newCurrency;
+                
+                updateUI(userProfileData);
+                fetchUserStatistics(); // Refresh spent display with new currency symbol
+                mainCard.classList.remove('is-editing');
+                showToast("Profile updated successfully!");
+            } catch (err) {
+                showToast("Error updating profile: " + err.message, "error");
+            }
+        });
+
+        // Handle Image Upload & Cropping
+        document.getElementById('image-upload').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    cropperImg.src = event.target.result;
+                    cropperModal.classList.add('active');
+                    
+                    if (cropper) cropper.destroy();
+                    
+                    cropper = new Cropper(cropperImg, {
+                        aspectRatio: 1,
+                        viewMode: 2,
+                        guides: true,
+                        autoCropArea: 1,
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('close-cropper').addEventListener('click', () => {
+            cropperModal.classList.remove('active');
+            document.getElementById('image-upload').value = "";
+        });
+
+        document.getElementById('save-crop').addEventListener('click', async () => {
+            if (!cropper) return;
+
+            const canvas = cropper.getCroppedCanvas({
+                width: 400,
+                height: 400
+            });
+
+            canvas.toBlob(async (blob) => {
+                try {
+                    showToast("Uploading image...");
+                    cropperModal.classList.remove('active');
+                    
+                    const storageRef = ref(storage, `profiles/${currentUser.uid}.jpg`);
+                    await uploadBytes(storageRef, blob);
+                    const downloadURL = await getDownloadURL(storageRef);
+
+                    // Update Firestore
+                    const userRef = doc(db, "users", currentUser.uid);
+                    await updateDoc(userRef, { photoURL: downloadURL });
+
+                    // Update Auth Profile
+                    await updateProfile(currentUser, { photoURL: downloadURL });
+
+                    userProfileData.photoURL = downloadURL;
+                    document.getElementById('display-photo').src = downloadURL;
+                    
+                    showToast("Profile picture updated!");
+                } catch (error) {
+                    showToast("Upload failed: " + error.message, "error");
+                }
+            }, 'image/jpeg');
+        });
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await signOut(auth);
+                window.location.href = "login.html";
+            } catch (err) {
+                showToast("Logout failed", "error");
+            }
+        });
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        themeToggle.innerHTML = currentTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+
+        themeToggle.addEventListener('click', () => {
+            let theme = document.documentElement.getAttribute('data-theme');
+            let newTheme = theme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            themeToggle.innerHTML = newTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        });
+
+        // Helpers
+        function getCurrencySymbol(code) {
+            const symbols = {
+                'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥', 'INR': '₹', 'CAD': '$', 'AUD': '$'
+            };
+            return symbols[code] || '$';
+        }
+
+        // --- Extended Logic for "Production-Ready" feel ---
+        
+        // Handle window resizing for cropper
+        window.addEventListener('resize', () => {
+            if (cropper) {
+                cropper.clear();
+                cropper.crop();
+            }
+        });
+
+        // Accessibility: Close modal on Escape
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && cropperModal.classList.contains('active')) {
+                cropperModal.classList.remove('active');
+            }
+        });
+
+        // Real-time listener for profile changes (in case of multi-device sync)
+        const unsub = onSnapshot(doc(db, "users", auth.currentUser?.uid || "placeholder"), (doc) => {
+            if (doc.exists() && !mainCard.classList.contains('is-editing')) {
+                userProfileData = doc.data();
+                updateUI(userProfileData);
+            }
+        });
+
+    </script>
+</body>
+</html>
